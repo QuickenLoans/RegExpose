@@ -256,7 +256,9 @@ namespace RegExpose.UI
 
         private void ParseInput()
         {
-            IList<CachedStep> cachedSteps;
+            lvMessages.Items.Clear();
+
+            IEnumerable<CachedStep> cachedSteps;
 
             try
             {
