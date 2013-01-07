@@ -44,11 +44,11 @@ namespace RegExpose.Nodes.Parens
                     if (!Negative)
                     {
                         // TODO: we need to forward any captures from the look-ahead to the outer engine.
-                        yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State.Plus(engine.State.Index)).WithSkipAdvanceOnFail(true);
                     }
                     else
                     {
-                        yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State.Plus(engine.State.Index)).WithSkipAdvanceOnFail(true);
                     }
 
                     yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
@@ -66,7 +66,7 @@ namespace RegExpose.Nodes.Parens
                     else if (Negative && ReferenceEquals(result.Node, _regex) && result.Type == ParseStepType.Fail)
                     {
                         // TODO: we need to forward any captures from the look-ahead to the outer engine.
-                        yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State.Plus(engine.State.Index)).WithSkipAdvanceOnFail(true);
                         yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
                         yield return ParseStep.Break(this).WithSkipAdvanceOnFail(true);
                     }
@@ -82,12 +82,12 @@ namespace RegExpose.Nodes.Parens
 
             if (!Negative)
             {
-                yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State.Plus(engine.State.Index)).WithSkipAdvanceOnFail(true);
             }
             else
             {
                 // TODO: we need to forward any captures from the look-ahead to the outer engine.
-                yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State.Plus(engine.State.Index)).WithSkipAdvanceOnFail(true);
             }
 
             yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
