@@ -18,19 +18,19 @@ namespace RegExpose
         {
         }
 
-        internal static ParseStep Pass(RegexNode node, string matchedText, State initialState, State currentState, int indexModifier = 0)
+        internal static ParseStep Pass(RegexNode node, string matchedText, State initialState, State currentState)
         {
             return new ParseStep
             {
                 Type = ParseStepType.Pass,
                 Node = node,
                 MatchedText = matchedText,
-                InitialState = initialState.Plus(indexModifier),
-                CurrentState = currentState.Plus(indexModifier)
+                InitialState = initialState,
+                CurrentState = currentState
             }.WithMessage(step => node.GetPassMessage(step.MatchedText, step.InitialState));
         }
 
-        internal static ParseStep Capture(RegexNode node, string capturedText, int captureNumber, State initialState, State currentState, int indexModifier = 0)
+        internal static ParseStep Capture(RegexNode node, string capturedText, int captureNumber, State initialState, State currentState)
         {
             return new ParseStep
             {
@@ -38,8 +38,8 @@ namespace RegExpose
                 Node = node,
                 MatchedText = capturedText,
                 CaptureNumber = captureNumber,
-                InitialState = initialState.Plus(indexModifier),
-                CurrentState = currentState.Plus(indexModifier)
+                InitialState = initialState,
+                CurrentState = currentState
             }.WithMessage(step => 
                 string.Format(
                     "Captured '{0}' (capture number: {1}) starting at index {2}",
@@ -63,46 +63,36 @@ namespace RegExpose
                     step.CaptureNumber));
         }
 
-        internal static ParseStep Fail(RegexNode node, State initialState, State currentState, string additionalMessage = null, int indexModifier = 0)
+        internal static ParseStep Fail(RegexNode node, State initialState, State currentState, string additionalMessage = null)
         {
             return new ParseStep
             {
                 Type = ParseStepType.Fail,
                 Node = node,
-                InitialState = initialState.Plus(indexModifier),
-                CurrentState = currentState.Plus(indexModifier)
+                InitialState = initialState,
+                CurrentState = currentState
             }.WithMessage(step => (additionalMessage != null ? additionalMessage + ": " : "") + node.GetFailMessage(step.InitialState));
         }
 
-        internal static ParseStep Info(RegexNode node, State currentState, string message, int indexModifier = 0)
-        {
-            return new ParseStep
-            {
-                Type = ParseStepType.Info,
-                Node = node,
-                CurrentState = currentState.Plus(indexModifier)
-            }.WithMessage(step => message);
-        }
-
-        internal static ParseStep Match(Regex regex, State initialState, string matchedText, IList<IList<ParenCapture>> captures, int indexModifier = 0)
+        internal static ParseStep Match(Regex regex, State initialState, string matchedText, IList<IList<ParenCapture>> captures)
         {
             return new ParseStep
             {
                 Type = ParseStepType.Match,
                 Node = regex,
                 MatchedText = matchedText,
-                InitialState = initialState.Plus(indexModifier),
+                InitialState = initialState,
                 Captures = captures
             }.WithMessage(step => regex.GetPassMessage(step.MatchedText, step.InitialState));
         }
 
-        internal static ParseStep AdvanceIndex(RegexNode node, State state, int indexModifier = 0)
+        internal static ParseStep AdvanceIndex(RegexNode node, State state)
         {
             return new ParseStep
             {
                 Type = ParseStepType.AdvanceIndex,
                 Node = node,
-                CurrentState = state.Plus(indexModifier),
+                CurrentState = state,
             }.WithMessage(step => string.Format("Advanced index to {0}", step.CurrentState.Index));
         }
 
@@ -134,54 +124,54 @@ namespace RegExpose
             }.WithMessage(step => "Look-around ended");
         }
 
-        internal static ParseStep StateSaved(RegexNode node, State currentState, string message, int indexModifier = 0)
+        internal static ParseStep StateSaved(RegexNode node, State currentState, string message)
         {
             return new ParseStep
             {
                 Type = ParseStepType.StateSaved,
                 Node = node,
-                CurrentState = currentState.Plus(indexModifier)
+                CurrentState = currentState
             }.WithMessage(step => message);
         }
 
-        internal static ParseStep Backtrack(RegexNode node, State initialState, State backtrackState, int indexModifier = 0)
+        internal static ParseStep Backtrack(RegexNode node, State initialState, State backtrackState)
         {
             return new ParseStep
             {
                 Type = ParseStepType.Backtrack,
                 Node = node,
-                InitialState = initialState.Plus(indexModifier),
-                CurrentState = backtrackState.Plus(indexModifier)
+                InitialState = initialState,
+                CurrentState = backtrackState
             }.WithMessage(step => string.Format("Backtracking to {0}", step.CurrentState.Index));
         }
 
-        internal static ParseStep EndOfString(RegexNode node, State currentState, int indexModifier = 0)
+        internal static ParseStep EndOfString(RegexNode node, State currentState)
         {
             return new ParseStep
             {
                 Type = ParseStepType.EndOfString,
                 Node = node,
-                CurrentState = currentState.Plus(indexModifier)
+                CurrentState = currentState
             }.WithMessage(step => "End of string");
         }
 
-        public static ParseStep BeginParse(RegexNode node, State initialState, int indexModifier = 0)
+        public static ParseStep BeginParse(RegexNode node, State initialState)
         {
             return new ParseStep
             {
                 Type = ParseStepType.BeginParse,
                 Node = node,
-                InitialState = initialState.Plus(indexModifier)
+                InitialState = initialState
             }.WithMessage(step => "Parse started");
         }
 
-        public static ParseStep ResetIndex(RegexNode node, State initialState, int indexModifier = 0)
+        public static ParseStep ResetIndex(RegexNode node, State initialState)
         {
             return new ParseStep
             {
                 Type = ParseStepType.ResetIndex,
                 Node = node,
-                InitialState = initialState.Plus(indexModifier)
+                InitialState = initialState
             }.WithMessage(step => string.Format("Resetting index to {0}", step.InitialState.Index));
         }
 
@@ -227,6 +217,8 @@ namespace RegExpose
             get { return InitialState.Index; }
         }
 
+        public bool SkipAdvanceOnFail { get; private set; }
+
         internal ParseStep SetStepIndex(int index)
         {
             StepIndex = index;
@@ -260,9 +252,14 @@ namespace RegExpose
             return this;
         }
 
-        public ParseStep ConvertToOuterContext(string input, int indexModifier, RegexNode regexNode, Func<RegexNode, bool> changeNodePredicate)
+        public ParseStep ConvertToOuterContext(string input, int indexModifier, RegexNode regexNode, Func<RegexNode, bool> changeNodePredicate, Func<string, string> modifyMessageFunction)
         {
-            Node = changeNodePredicate(Node) ? regexNode : Node;
+            if (changeNodePredicate(Node))
+            {
+                Node = regexNode;
+                var originalGetMessage = _getMessage;
+                _getMessage = step => modifyMessageFunction(originalGetMessage(step));
+            }
             InitialState = InitialState == null ? null : new State(input, InitialState.Index + indexModifier);
             CurrentState = CurrentState == null ? null : new State(input, CurrentState.Index + indexModifier);
             return this;
@@ -279,6 +276,12 @@ namespace RegExpose
                 Type = ParseStepType.LookaroundResetIndex;
             }
 
+            return this;
+        }
+
+        public ParseStep WithSkipAdvanceOnFail(bool skipAdvanceOnFail)
+        {
+            SkipAdvanceOnFail = skipAdvanceOnFail;
             return this;
         }
     }

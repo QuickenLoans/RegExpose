@@ -29,7 +29,7 @@ namespace RegExpose.Nodes.Parens
             var engine = new RegexEngine.RegexEngineInternal(outerEngine.Input.Substring(outerEngine.State.Index));
             var modifier = outerEngine.State.Index;
 
-            yield return ParseStep.StartLookaround(this, outerEngine.State);
+            yield return ParseStep.StartLookaround(this, outerEngine.State).WithSkipAdvanceOnFail(true);
 
             foreach (var result in _regex.Parse(engine))
             {
@@ -41,30 +41,57 @@ namespace RegExpose.Nodes.Parens
 
                 if (ReferenceEquals(result.Node, _regex) && result.Type == ParseStepType.Match)
                 {
-                    // TODO: we need to forward any captures from the look-ahead to the outer engine.
-                    yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State);
-                    yield return ParseStep.EndLookaround(this);
+                    if (!Negative)
+                    {
+                        // TODO: we need to forward any captures from the look-ahead to the outer engine.
+                        yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                    }
+                    else
+                    {
+                        yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                    }
 
-                    yield return ParseStep.Break(this);
+                    yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
+                    yield return ParseStep.Break(this).WithSkipAdvanceOnFail(true);
                 }
 
                 if (result.Type != ParseStepType.Break && engine.State.Index <= engine.Input.Length)
                 {
-                    yield return result
-                        .ConvertToOuterContext(outerEngine.Input, modifier, this, n => ReferenceEquals(n, _regex))
-                        .AsLookaround();
-
-                    if (ReferenceEquals(result.Node, this) && result.Type == ParseStepType.Fail)
+                    if (!Negative && ReferenceEquals(result.Node, _regex) && result.Type == ParseStepType.Fail)
                     {
-                        yield return ParseStep.EndLookaround(this);
-                        yield return ParseStep.Break(this);
+                        yield return result.ConvertToOuterContext(outerEngine.Input, modifier, this, n => true, message => message.Replace(_regex.NodeType, NodeType)).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.Break(this).WithSkipAdvanceOnFail(true);
+                    }
+                    else if (Negative && ReferenceEquals(result.Node, _regex) && result.Type == ParseStepType.Fail)
+                    {
+                        // TODO: we need to forward any captures from the look-ahead to the outer engine.
+                        yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
+                        yield return ParseStep.Break(this).WithSkipAdvanceOnFail(true);
+                    }
+                    else
+                    {
+                        yield return result
+                        .ConvertToOuterContext(outerEngine.Input, modifier, this, n => ReferenceEquals(n, _regex), message => message.Replace(_regex.NodeType, NodeType))
+                        .AsLookaround()
+                        .WithSkipAdvanceOnFail(true);
                     }
                 }
             }
 
-            yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State);
-            yield return ParseStep.EndLookaround(this);
-            yield return ParseStep.Break(this);
+            if (!Negative)
+            {
+                yield return ParseStep.Fail(this, outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+            }
+            else
+            {
+                // TODO: we need to forward any captures from the look-ahead to the outer engine.
+                yield return ParseStep.Pass(this, "", outerEngine.State, outerEngine.State).WithSkipAdvanceOnFail(true);
+            }
+
+            yield return ParseStep.EndLookaround(this).WithSkipAdvanceOnFail(true);
+            yield return ParseStep.Break(this).WithSkipAdvanceOnFail(true);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace RegExpose
         Capture,
         CaptureDiscarded,
         Fail,
-        Info,
         Match,
         StateSaved,
         Break,

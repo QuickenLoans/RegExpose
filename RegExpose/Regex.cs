@@ -55,11 +55,14 @@ namespace RegExpose
             yield return ParseStep.BeginParse(this, engine.State);
         }
 
-        protected override IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState)
+        protected override IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState, bool skipAdvance)
         {
             yield return ParseStep.Fail(this, initialState, currentState);
-            engine.State = engine.State.Advance();
-            yield return ParseStep.AdvanceIndex(this, engine.State);
+            if (!skipAdvance)
+            {
+                engine.State = engine.State.Advance();
+                yield return ParseStep.AdvanceIndex(this, engine.State);
+            }
         }
 
         protected override IEnumerable<ParseStep> GetEndOfStringSteps(IRegexEngine engine)

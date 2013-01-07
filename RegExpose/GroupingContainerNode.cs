@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using RegExpose.Nodes;
 using RegExpose.Nodes.Parens;
@@ -24,6 +25,8 @@ namespace RegExpose
             {
                 var initialState = engine.State;
                 var matchSuccess = true;
+                State failedState = null;
+                var skipAdvanceOnFail = false;
 
                 // For this location in the input, try every child node.
                 for (var item = savedState == null ? Children.First : savedState.Item; item != null;)
@@ -58,6 +61,11 @@ namespace RegExpose
                             {
                                 // If our child told us to break, do so. (this indicates that the child was done, regardless of success or failure
                                 break;
+                            }
+                            else if (result.Type == ParseStepType.Fail)
+                            {
+                                failedState = result.CurrentState;
+                                skipAdvanceOnFail = result.SkipAdvanceOnFail;
                             }
                         }
 
@@ -126,7 +134,8 @@ namespace RegExpose
                 else
                 {
                     // We failed at this index location. Advance the engine and start all over again.
-                    foreach (var failStep in GetFailParseSteps(engine, initialState, engine.State))
+                    Debug.Assert(failedState != null);
+                    foreach (var failStep in GetFailParseSteps(engine, initialState, failedState, skipAdvanceOnFail))
                     {
                         yield return failStep;
                     }
@@ -141,7 +150,7 @@ namespace RegExpose
         }
 
         protected abstract IEnumerable<ParseStep> GetSuccessParseStep(IRegexEngine engine, State initialState);
-        protected abstract IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState);
+        protected abstract IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState, bool skipAdvance);
         protected abstract IEnumerable<ParseStep> GetEndOfStringSteps(IRegexEngine engine); 
 
         private class SavedState : ISavedState

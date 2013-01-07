@@ -110,6 +110,13 @@ namespace RegExpose.Tests
         {
             PerformTest(input, pattern, RegexOptions.None);
         }
+
+        [TestCase("foobar", @"foo(?!bar)")]
+        [TestCase("foobaz", @"foo(?!bar)")]
+        public void NegativeLookAhead(string input, string pattern)
+        {
+            PerformTest(input, pattern, RegexOptions.None);
+        }
     }
 
     public class KnownIssues : MatchTestsBase
@@ -143,7 +150,8 @@ namespace RegExpose.Tests
                 var match = matchesEnumerator.Current;
                 var netMatch = netMatchesEnumerator.Current;
 
-                Debug.WriteLine("Match was {0}successful.", match == null ? "un" : "");
+                object un = match == null ? "un" : "";
+                Debug.WriteLine("Match was {0}successful.", un);
                 Debug.WriteLine("");
                 DumpParseSteps(engine, pattern);
 

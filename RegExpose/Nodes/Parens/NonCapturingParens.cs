@@ -16,7 +16,7 @@ namespace RegExpose.Nodes.Parens
             yield return ParseStep.Break(this);
         }
 
-        protected override IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState)
+        protected override IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState, bool skipAdvance)
         {
             yield return ParseStep.Fail(this, initialState, currentState);
             yield return ParseStep.Break(this);
