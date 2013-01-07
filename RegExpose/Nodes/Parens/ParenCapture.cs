@@ -46,5 +46,38 @@ namespace RegExpose.Nodes.Parens
         {
             get { return Index >= 0; }
         }
+
+        public bool Equals(ParenCapture other)
+        {
+            return _number == other._number && _index == other._index && string.Equals(_value, other._value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+            return Equals((ParenCapture)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = _number;
+                hashCode = (hashCode * 397) ^ _index;
+                hashCode = (hashCode * 397) ^ (_value != null ? _value.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
     }
 }

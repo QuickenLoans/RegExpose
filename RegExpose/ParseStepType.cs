@@ -4,6 +4,7 @@ namespace RegExpose
     {
         Pass,
         Capture,
+        CaptureDiscarded,
         Fail,
         Info,
         Match,

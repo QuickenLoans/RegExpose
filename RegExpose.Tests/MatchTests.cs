@@ -81,6 +81,9 @@ namespace RegExpose.Tests
         [TestCase("1234", @"^([a-zA-Z_]\w\w\w|\d\d\d\d|24680)$")]
         [TestCase("246800", @"^([a-zA-Z_]\w\w\w|\d\d\d\d|24680)$")]
         [TestCase("Doods", @"^([a-zA-Z_]\w\w\w|\d\d\d\d|24680)$")]
+        [TestCase("a", @"(a|b)?a")]
+        [TestCase("b", @"(a|b)?b")]
+        [TestCase("24680", @"^([a-zA-Z_]\w\w\w|\d\d\d\d|24680)$")]
         public void Alternation(string input, string pattern)
         {
             PerformTest(input, pattern, RegexOptions.None);
@@ -112,9 +115,6 @@ namespace RegExpose.Tests
     public class KnownIssues : MatchTestsBase
     {
         [Category("KnownIssues")]
-        [TestCase("a", @"(a|b)?a", Description = "Over-eager capturing - (should have error: 'Expected string length 0 but was 1. Strings differ at index 0.')")]
-        [TestCase("b", @"(a|b)?b", Description = "Over-eager capturing - (should have error: 'Expected string length 0 but was 1. Strings differ at index 0.')")]
-        [TestCase("24680", @"^([a-zA-Z_]\w\w\w|\d\d\d\d|24680)$", Description = "Over-eager capturing - (should have error: 'Unequal Capture count in Group')")]
         public void Alternation(string input, string pattern)
         {
             PerformTest(input, pattern, RegexOptions.None);

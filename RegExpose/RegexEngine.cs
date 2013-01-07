@@ -116,7 +116,8 @@ namespace RegExpose
         internal class RegexEngineInternal : IRegexEngine
         {
             private readonly string _input;
-            private readonly Dictionary<int, Stack<ParenCapture>> _captures = new Dictionary<int, Stack<ParenCapture>>(); 
+            private readonly Dictionary<int, Stack<ParenCapture>> _captures = new Dictionary<int, Stack<ParenCapture>>();
+            private readonly List<ISavedState> _savedStates = new List<ISavedState>();
 
             public RegexEngineInternal(string input)
             {
@@ -138,20 +139,38 @@ namespace RegExpose
                     _captures.Add(number, new Stack<ParenCapture>());
                 }
 
-                _captures[number].Push(ParenCapture.Pass(number, index, value));
+                var capture = ParenCapture.Pass(number, index, value);
+                _captures[number].Push(capture);
+
+                // In case there are any saved states, we need to associate the capture with all of them. That way, should
+                // a saved state be backtracted away, it can clear any captures associated with it.
+                foreach (var savedState in _savedStates)
+                {
+                    savedState.AddCapture(capture);
+                }
             }
 
-            public void PopCapture(int number)
+            public bool PopCapture(int number)
             {
                 if (_captures.ContainsKey(number) && _captures[number].Count > 0)
                 {
-                    _captures[number].Pop();
+                    var capture = _captures[number].Pop();
 
                     if (_captures[number].Count == 0)
                     {
                         _captures.Remove(number);
                     }
+
+                    // If we're popping a capture, remove it from each of the saved states.
+                    foreach (var savedState in _savedStates)
+                    {
+                        savedState.RemoveCapture(capture);
+                    }
+
+                    return true;
                 }
+
+                return false;
             }
 
             public IEnumerable<ParenCapture> GetCaptures(int number)
@@ -161,6 +180,11 @@ namespace RegExpose
                         _captures.ContainsKey(number)
                             ? _captures[number].ToList()
                             : (IList<ParenCapture>)new[] { ParenCapture.Fail(number) });
+            }
+
+            public void AddSavedState(ISavedState state)
+            {
+                _savedStates.Add(state);
             }
 
             public override string ToString()

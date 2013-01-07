@@ -48,6 +48,21 @@ namespace RegExpose
                     step.InitialState.Index));
         }
 
+        internal static ParseStep CaptureDiscarded(RegexNode node, string capturedText, int captureNumber)
+        {
+            return new ParseStep
+            {
+                Type = ParseStepType.CaptureDiscarded,
+                Node = node,
+                MatchedText = capturedText,
+                CaptureNumber = captureNumber
+            }.WithMessage(step =>
+                string.Format(
+                    "Discarded captured text, '{0}' (capture number: {1})",
+                    step.MatchedText,
+                    step.CaptureNumber));
+        }
+
         internal static ParseStep Fail(RegexNode node, State initialState, State currentState, string additionalMessage = null, int indexModifier = 0)
         {
             return new ParseStep

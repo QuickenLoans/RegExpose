@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using RegExpose.Nodes;
+using RegExpose.Nodes.Parens;
 
 namespace RegExpose
 {
@@ -40,7 +42,9 @@ namespace RegExpose
                         if (result.Type == ParseStepType.StateSaved)
                         {
                             // If decendent said it's saved its state - we need to do the same.
-                            savedStates.Push(new SavedState(nodeResultEnumerator, item, result.CurrentState));
+                            var state = new SavedState(nodeResultEnumerator, item, result.CurrentState);
+                            engine.AddSavedState(state);
+                            savedStates.Push(state);
                         }
 
                         if (ReferenceEquals(node, result.Node)) // We only pay attention to our children's results
@@ -67,6 +71,10 @@ namespace RegExpose
                         {
                             // If our child told us that it backtracked, begin backtracking.
                             savedState = savedStates.Pop();
+                            foreach (var capture in savedState.PopCaptures(engine))
+                            {
+                                yield return ParseStep.CaptureDiscarded(savedState.Item.Value, capture.Value, capture.Number);
+                            }
                             item = savedState.Item;
                         }
                         else
@@ -108,6 +116,10 @@ namespace RegExpose
                     {
                         // If our child told us that it backtracked, begin backtracking.
                         savedState = savedStates.Pop();
+                        foreach (var capture in savedState.PopCaptures(engine))
+                        {
+                            yield return ParseStep.CaptureDiscarded(savedState.Item.Value, capture.Value, capture.Number);
+                        }
                         engine.State = savedState.CurrentState;
                     }
                 }
@@ -132,11 +144,12 @@ namespace RegExpose
         protected abstract IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState);
         protected abstract IEnumerable<ParseStep> GetEndOfStringSteps(IRegexEngine engine); 
 
-        private class SavedState
+        private class SavedState : ISavedState
         {
             private readonly IEnumerator<ParseStep> _enumerator;
             private readonly LinkedListNode<RegexNode> _item;
             private readonly State _state;
+            private readonly List<ParenCapture> _captures = new List<ParenCapture>();
 
             public SavedState(IEnumerator<ParseStep> enumerator, LinkedListNode<RegexNode> item, State currentState)
             {
@@ -159,6 +172,28 @@ namespace RegExpose
             {
                 get { return _state; }
             }
+
+            public void AddCapture(ParenCapture capture)
+            {
+                _captures.Add(capture);
+            }
+
+            public void RemoveCapture(ParenCapture capture)
+            {
+                _captures.Remove(capture);
+            }
+
+            public IEnumerable<ParenCapture> PopCaptures(IRegexEngine engine)
+            {
+                var captures = _captures.ToArray();
+                return captures.Where(capture => engine.PopCapture(capture.Number));
+            }
         }
+    }
+
+    public interface ISavedState
+    {
+        void AddCapture(ParenCapture capture);
+        void RemoveCapture(ParenCapture capture);
     }
 }
