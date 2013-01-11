@@ -62,6 +62,7 @@
     <Compile Include="Nodes\Anchors\StartOfString.cs" />
     <Compile Include="Nodes\Backreferences\Backreference.cs" />
     <Compile Include="Nodes\Backreferences\NamedBackreference.cs" />
+    <Compile Include="Nodes\Parens\LookAround.cs" />
     <Compile Include="Nodes\ZeroWidthAssertion.cs" />
     <Compile Include="Nodes\Boundries\WordBoundry.cs" />
     <Compile Include="Nodes\Character\CharacterClass.cs" />

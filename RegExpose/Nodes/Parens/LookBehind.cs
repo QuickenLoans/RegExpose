@@ -1,33 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using RegExpose.Nodes.Anchors;
 
 namespace RegExpose.Nodes.Parens
 {
-    public class LookBehind : ContainerNode
+    public class LookBehind : LookAround
     {
-        private readonly EndOfString _nonReportingEndOfString;
-        private readonly Regex _regex;
-
         public LookBehind(bool negative, IEnumerable<RegexNode> children, int index, string pattern)
-            : base(children, index, pattern)
+            : base(negative, children, index, pattern)
         {
-            _nonReportingEndOfString = new EndOfString(false, 0, "");
-            _regex = new Regex(Children.Concat(new RegexNode[] { _nonReportingEndOfString }), 0, pattern);
-            Negative = negative;
+            _nonReportingNode = new EndOfString(false, 0, "");
+            _regex = new Regex(Children.Concat(new[] { _nonReportingNode }), 0, pattern);
         }
-
-        public bool Negative { get; private set; }
 
         public override string NodeType
         {
             get { return string.Format("{0} Look-behind", Negative ? "Negative" : "Positive"); }
         }
 
-        internal override IEnumerable<ParseStep> Parse(IRegexEngine engine)
+        protected override string GetEngineInput(IRegexEngine outerEngine)
         {
-            throw new NotImplementedException();
+            return outerEngine.Input.Substring(0, outerEngine.State.Index);
+        }
+
+        protected override int GetModifier(IRegexEngine outerEngine)
+        {
+            return 0;
+        }
+
+        protected override bool ShouldSkipAdvance
+        {
+            get { return false; }
         }
     }
 }

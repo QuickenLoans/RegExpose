@@ -117,6 +117,26 @@ namespace RegExpose.Tests
         {
             PerformTest(input, pattern, RegexOptions.None);
         }
+
+        [TestCase("USD100", @"\d{3}(?<=USD\d{3})")]
+        [TestCase("USD100", @"(?<=USD)\d{3}")]
+        [TestCase("blah USD100 blah", @"\d{3}(?<=USD\d{3})")]
+        [TestCase("blah USD100 blah", @"(?<=USD)\d{3}")]
+        [TestCase("JPY100", @"\d{3}(?<=USD\d{3})")]
+        [TestCase("JPY100", @"(?<=USD)\d{3}")]
+        [TestCase("blah JPY100 blah", @"\d{3}(?<=USD\d{3})")]
+        [TestCase("blah JPY100 blah", @"(?<=USD)\d{3}")]
+        public void PositiveLookBehind(string input, string pattern)
+        {
+            PerformTest(input, pattern, RegexOptions.None);
+        }
+
+        //[TestCase("foobar", @"foo(?!bar)")]
+        //[TestCase("foobaz", @"foo(?!bar)")]
+        //public void NegativeLookBehind(string input, string pattern)
+        //{
+        //    PerformTest(input, pattern, RegexOptions.None);
+        //}
     }
 
     public class KnownIssues : MatchTestsBase

@@ -10,6 +10,7 @@ namespace RegExpose
         void AddCapture(int number, int index, string value);
         bool PopCapture(int number);
         IEnumerable<ParenCapture> GetCaptures(int number);
+        IEnumerable<KeyValuePair<int, Stack<ParenCapture>>> GetAllDefinedCaptures();
         void AddSavedState(ISavedState state);
     }
 }

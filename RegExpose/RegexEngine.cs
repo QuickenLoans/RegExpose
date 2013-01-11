@@ -20,8 +20,13 @@ namespace RegExpose
             _getParseSteps = () => regex.Parse(new RegexEngineInternal(input));
         }
 
-        public IEnumerable<ParseStep> GetParseSteps()
+        public IEnumerable<ParseStep> GetParseSteps(Func<ParseStep, bool> excludePredicate = null)
         {
+            if (excludePredicate == null)
+            {
+                excludePredicate = step => false;
+            }
+
             var index = 0;
             var enumerator = _getParseSteps().GetEnumerator();
 
@@ -47,8 +52,12 @@ namespace RegExpose
                     yield break;
                 }
 
-                var step = enumerator.Current;
-                yield return step.SetStepIndex(index);
+                if (excludePredicate(enumerator.Current))
+                {
+                    continue;
+                }
+
+                yield return enumerator.Current.SetStepIndex(index);
                 index++;
             }
         }
@@ -180,6 +189,11 @@ namespace RegExpose
                         _captures.ContainsKey(number)
                             ? _captures[number].ToList()
                             : (IList<ParenCapture>)new[] { ParenCapture.Fail(number) });
+            }
+
+            public IEnumerable<KeyValuePair<int, Stack<ParenCapture>>> GetAllDefinedCaptures()
+            {
+                return _captures;
             }
 
             public void AddSavedState(ISavedState state)

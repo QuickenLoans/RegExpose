@@ -337,10 +337,12 @@ namespace RegExpose.UI
                 else if (step.Type == ParseStepType.Match)
                 {
                     savedStates.Clear();
+                    currentLookaroundIndex = -1;
                 }
                 else if (step.Type == ParseStepType.AdvanceIndex || step.Type == ParseStepType.ResetIndex)
                 {
                     currentIndex = step.CurrentState.Index;
+                    currentLookaroundIndex = -1;
                 }
                 else if (step.Type == ParseStepType.Backtrack)
                 {

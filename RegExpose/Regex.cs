@@ -42,8 +42,7 @@ namespace RegExpose
                 engine.PopCapture(capturingParen.Number);
             }
 
-            var parseStep = ParseStep.Match(this, initialState, matchedText, new ReadOnlyCollection<IList<ParenCapture>>(captureSet));
-            yield return parseStep;
+            yield return ParseStep.Match(this, initialState, matchedText, new ReadOnlyCollection<IList<ParenCapture>>(captureSet));
 
             if (initialState.Index == engine.State.Index)
             {
@@ -58,6 +57,7 @@ namespace RegExpose
         protected override IEnumerable<ParseStep> GetFailParseSteps(IRegexEngine engine, State initialState, State currentState, bool skipAdvance)
         {
             yield return ParseStep.Fail(this, initialState, currentState);
+
             if (!skipAdvance)
             {
                 engine.State = engine.State.Advance();

@@ -35,20 +35,20 @@
             this.singleLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.multiLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCompile = new WindowsFormsToolkit.Controls.SplitButton();
-            this.txtPattern = new RegExpose.UI.RegExposeRichTextBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.btnParse = new System.Windows.Forms.Button();
-            this.txtInput = new RegExpose.UI.RegExposeRichTextBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.tvRegex = new System.Windows.Forms.TreeView();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.lblMessage = new RegExpose.UI.RegExposeRichTextBox();
+            this.txtInput = new RegExpose.UI.RegExposeRichTextBox();
             this.lvMessages = new RegExpose.UI.HighlightableListView();
             this.columnHeaderIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderNodeType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderPattern = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.lblMessage = new RegExpose.UI.RegExposeRichTextBox();
+            this.txtPattern = new RegExpose.UI.RegExposeRichTextBox();
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
@@ -109,21 +109,6 @@
             this.btnCompile.UseVisualStyleBackColor = true;
             this.btnCompile.Click += new System.EventHandler(this.BtnCompileOnClick);
             // 
-            // txtPattern
-            // 
-            this.txtPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPattern.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtPattern.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPattern.Location = new System.Drawing.Point(11, 11);
-            this.txtPattern.Margin = new System.Windows.Forms.Padding(2);
-            this.txtPattern.Multiline = false;
-            this.txtPattern.Name = "txtPattern";
-            this.txtPattern.Size = new System.Drawing.Size(841, 39);
-            this.txtPattern.TabIndex = 0;
-            this.txtPattern.Text = "";
-            this.txtPattern.TextChanged += new System.EventHandler(this.TxtPatternOnTextChanged);
-            // 
             // splitContainer2
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -160,21 +145,6 @@
             this.btnParse.UseVisualStyleBackColor = true;
             this.btnParse.Click += new System.EventHandler(this.BtnParseOnClick);
             // 
-            // txtInput
-            // 
-            this.txtInput.AcceptsTab = true;
-            this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtInput.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtInput.Location = new System.Drawing.Point(0, 0);
-            this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(841, 64);
-            this.txtInput.TabIndex = 0;
-            this.txtInput.Text = "";
-            this.txtInput.TextChanged += new System.EventHandler(this.TxtInputOnTextChanged);
-            // 
             // splitContainer3
             // 
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -205,6 +175,58 @@
             this.tvRegex.TabIndex = 0;
             this.tvRegex.TabStop = false;
             this.tvRegex.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TvRegexOnBeforeSelect);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer1.Location = new System.Drawing.Point(11, 54);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(2);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.lblMessage);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Size = new System.Drawing.Size(986, 665);
+            this.splitContainer1.SplitterDistance = 64;
+            this.splitContainer1.TabIndex = 7;
+            this.splitContainer1.TabStop = false;
+            // 
+            // lblMessage
+            // 
+            this.lblMessage.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.lblMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.lblMessage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblMessage.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMessage.Location = new System.Drawing.Point(0, 0);
+            this.lblMessage.Name = "lblMessage";
+            this.lblMessage.ReadOnly = true;
+            this.lblMessage.Size = new System.Drawing.Size(986, 64);
+            this.lblMessage.TabIndex = 0;
+            this.lblMessage.TabStop = false;
+            this.lblMessage.Text = "";
+            // 
+            // txtInput
+            // 
+            this.txtInput.AcceptsTab = true;
+            this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtInput.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtInput.Location = new System.Drawing.Point(0, 0);
+            this.txtInput.Name = "txtInput";
+            this.txtInput.Size = new System.Drawing.Size(841, 64);
+            this.txtInput.TabIndex = 0;
+            this.txtInput.Text = "";
+            this.txtInput.TextChanged += new System.EventHandler(this.TxtInputOnTextChanged);
             // 
             // lvMessages
             // 
@@ -256,42 +278,20 @@
             this.columnHeaderMessage.Text = "Message";
             this.columnHeaderMessage.Width = 25;
             // 
-            // splitContainer1
+            // txtPattern
             // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.Location = new System.Drawing.Point(11, 54);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(2);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.lblMessage);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(986, 665);
-            this.splitContainer1.SplitterDistance = 64;
-            this.splitContainer1.TabIndex = 7;
-            this.splitContainer1.TabStop = false;
-            // 
-            // lblMessage
-            // 
-            this.lblMessage.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.lblMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.lblMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblMessage.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMessage.Location = new System.Drawing.Point(0, 0);
-            this.lblMessage.Name = "lblMessage";
-            this.lblMessage.ReadOnly = true;
-            this.lblMessage.Size = new System.Drawing.Size(986, 64);
-            this.lblMessage.TabIndex = 0;
-            this.lblMessage.TabStop = false;
-            this.lblMessage.Text = "";
+            this.txtPattern.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPattern.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPattern.Location = new System.Drawing.Point(11, 11);
+            this.txtPattern.Margin = new System.Windows.Forms.Padding(2);
+            this.txtPattern.Multiline = false;
+            this.txtPattern.Name = "txtPattern";
+            this.txtPattern.Size = new System.Drawing.Size(841, 39);
+            this.txtPattern.TabIndex = 0;
+            this.txtPattern.Text = "";
+            this.txtPattern.TextChanged += new System.EventHandler(this.TxtPatternOnTextChanged);
             // 
             // MainForm
             // 
