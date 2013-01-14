@@ -7,11 +7,13 @@ namespace RegExpose.Nodes.Backreferences
     public class Backreference : LeafNode
     {
         private readonly int _number;
+        private readonly bool _ignoreCase;
 
-        public Backreference(int number, int index, string pattern)
+        public Backreference(int number, bool ignoreCase, int index, string pattern)
             : base(index, pattern)
         {
             _number = number;
+            _ignoreCase = ignoreCase;
         }
 
         public int Number
@@ -38,7 +40,7 @@ namespace RegExpose.Nodes.Backreferences
             }
             else
             {
-                var literals = capture.Value.Select((c, i) => new CharacterLiteral(c, false, capture.Index + i, new string(new[] { c })));
+                var literals = capture.Value.Select((c, i) => new CharacterLiteral(c, _ignoreCase, capture.Index + i, new string(new[] { c })));
                 foreach (var literal in literals)
                 {
                     var success = false;
@@ -49,8 +51,6 @@ namespace RegExpose.Nodes.Backreferences
                         {
                             break;
                         }
-
-                        yield return result;
 
                         if (result.Type == ParseStepType.Pass)
                         {

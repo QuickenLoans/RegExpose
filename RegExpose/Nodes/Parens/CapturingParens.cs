@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace RegExpose.Nodes.Parens
 {
@@ -35,7 +34,7 @@ namespace RegExpose.Nodes.Parens
 
         public override string NodeType
         {
-            get { return "Capturing Parentheses"; }
+            get { return string.Format("Capturing Parentheses({0})", Number); }
         }
     }
 }

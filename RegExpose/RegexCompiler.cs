@@ -34,7 +34,7 @@ namespace RegExpose
             _characterNode = CreateQuantifierParser(CreateCharacterNodeParser(ignoreCase, singleLine));
             _anchor = CreateAnchorParser(multiLine);
             _wordBoundry = CreateWordBoundryParser();
-            _backreference = CreateBackreferenceParser();
+            _backreference = CreateBackreferenceParser(ignoreCase);
             _nonContainer = _characterNode.Or(_anchor).Or(_wordBoundry).Or(_backreference);
 
             _container = CreateQuantifierParser(x => GetContainer(x));
@@ -283,13 +283,13 @@ namespace RegExpose
             return wordBoundryParser;
         }
 
-        private Parser<RegexNode> CreateBackreferenceParser()
+        private Parser<RegexNode> CreateBackreferenceParser(bool ignoreCase)
         {
             Parser<RegexNode> backreferenceParser =
                 (from backslash in Parse.Char('\\')
                  from number in Parse.Number
                  select number)
-                    .ToRegexNode((number, index, pattern) => Parse.Return(new Backreference(int.Parse(number), index, pattern)));
+                    .ToRegexNode((number, index, pattern) => Parse.Return(new Backreference(int.Parse(number), ignoreCase, index, pattern)));
 
             Parser<RegexNode> angleBracketNamedBackreferenceParser =
                 (from backslash in Parse.Char('\\')
