@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegExpose", "RegExpose\RegExpose.csproj", "{9AE6D09D-71B5-4AD9-B6D4-E36AC4F8F55B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegExpose.Tests", "RegExpose.Tests\RegExpose.Tests.csproj", "{2502C356-AE9A-400B-BEE0-03A2C4E885CE}"
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{81C86C
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegExpose.Web", "RegExpose.Web\RegExpose.Web.csproj", "{B4840716-A220-4371-A479-5C562BC31231}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{C6D47B19-68B3-4234-AB62-F3A627C8A432}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6D47B19-68B3-4234-AB62-F3A627C8A432}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6D47B19-68B3-4234-AB62-F3A627C8A432}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4840716-A220-4371-A479-5C562BC31231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4840716-A220-4371-A479-5C562BC31231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4840716-A220-4371-A479-5C562BC31231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4840716-A220-4371-A479-5C562BC31231}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
