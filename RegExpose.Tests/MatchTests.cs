@@ -136,6 +136,12 @@ namespace RegExpose.Tests
         //{
         //    PerformTest(input, pattern, RegexOptions.None);
         //}
+
+        [TestCase("<a><b>c</b></c>", @"<(\w+)>[^<]*?</\1>")]
+        public void CapturingParenLazyStarAndBackreference(string input, string pattern)
+        {
+            PerformTest(input, pattern, RegexOptions.None);
+        }
     }
 
     public class KnownIssues : MatchTestsBase
