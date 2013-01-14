@@ -341,6 +341,9 @@ namespace RegExpose.UI
                         currentLookaroundIndex = -1;
                         break;
                     case ParseStepType.ResetIndex:
+                        currentIndex = step.InitialState.Index;
+                        currentLookaroundIndex = -1;
+                        break;
                     case ParseStepType.AdvanceIndex:
                         currentIndex = step.CurrentState.Index;
                         currentLookaroundIndex = -1;
