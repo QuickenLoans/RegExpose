@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using RegExpose.Nodes;
 using RegExpose.Nodes.Parens;
@@ -191,7 +190,6 @@ namespace RegExpose
         public string MatchedText { get; private set; }
         public State InitialState { get; private set; }
         public State CurrentState { get; private set; }
-        public int StepIndex { get; private set; }
         public int CaptureNumber { get; private set; }
         public Exception Exception { get; private set; }
 
@@ -219,12 +217,6 @@ namespace RegExpose
 
         public bool SkipAdvanceOnFail { get; private set; }
 
-        internal ParseStep SetStepIndex(int index)
-        {
-            StepIndex = index;
-            return this;
-        }
-
         public State Advance()
         {
 #if DEBUG
@@ -238,8 +230,7 @@ namespace RegExpose
 
         public override string ToString()
         {
-            return string.Format("{0}{1}{2}{3}{4}",
-                StepIndex.ToString(CultureInfo.InvariantCulture).PadRight(5),
+            return string.Format("{0}{1}{2}{3}",
                 Type.ToString().PadRight(15),
                 NodeType.PadRight(25),
                 Pattern.PadRight(35),

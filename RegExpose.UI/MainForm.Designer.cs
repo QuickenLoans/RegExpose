@@ -30,26 +30,27 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.compileMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ignoreCaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.singleLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.multiLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCompile = new WindowsFormsToolkit.Controls.SplitButton();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.btnParse = new System.Windows.Forms.Button();
+            this.btnParse = new WindowsFormsToolkit.Controls.SplitButton();
+            this.txtInput = new RegExpose.UI.RegExposeRichTextBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.tvRegex = new System.Windows.Forms.TreeView();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.lblMessage = new RegExpose.UI.RegExposeRichTextBox();
-            this.txtInput = new RegExpose.UI.RegExposeRichTextBox();
             this.lvMessages = new RegExpose.UI.HighlightableListView();
             this.columnHeaderIndex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderNodeType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderPattern = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.lblMessage = new RegExpose.UI.RegExposeRichTextBox();
             this.txtPattern = new RegExpose.UI.RegExposeRichTextBox();
-            this.contextMenuStrip.SuspendLayout();
+            this.parseMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.compileMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
@@ -64,14 +65,14 @@
             this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // contextMenuStrip
+            // compileMenuStrip
             // 
-            this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.compileMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ignoreCaseToolStripMenuItem,
             this.singleLineToolStripMenuItem,
             this.multiLineToolStripMenuItem});
-            this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(137, 70);
+            this.compileMenuStrip.Name = "contextMenuStrip";
+            this.compileMenuStrip.Size = new System.Drawing.Size(137, 70);
             // 
             // ignoreCaseToolStripMenuItem
             // 
@@ -98,7 +99,7 @@
             // 
             this.btnCompile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCompile.AutoSize = true;
-            this.btnCompile.ContextMenuStrip = this.contextMenuStrip;
+            this.btnCompile.ContextMenuStrip = this.compileMenuStrip;
             this.btnCompile.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F);
             this.btnCompile.Location = new System.Drawing.Point(856, 11);
             this.btnCompile.Margin = new System.Windows.Forms.Padding(2);
@@ -134,6 +135,8 @@
             // btnParse
             // 
             this.btnParse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnParse.AutoSize = true;
+            this.btnParse.ContextMenuStrip = this.parseMenuStrip;
             this.btnParse.Enabled = false;
             this.btnParse.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F);
             this.btnParse.Location = new System.Drawing.Point(845, 0);
@@ -144,6 +147,21 @@
             this.btnParse.Text = "Parse";
             this.btnParse.UseVisualStyleBackColor = true;
             this.btnParse.Click += new System.EventHandler(this.BtnParseOnClick);
+            // 
+            // txtInput
+            // 
+            this.txtInput.AcceptsTab = true;
+            this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtInput.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtInput.Location = new System.Drawing.Point(0, 0);
+            this.txtInput.Name = "txtInput";
+            this.txtInput.Size = new System.Drawing.Size(841, 64);
+            this.txtInput.TabIndex = 0;
+            this.txtInput.Text = "";
+            this.txtInput.TextChanged += new System.EventHandler(this.TxtInputOnTextChanged);
             // 
             // splitContainer3
             // 
@@ -175,58 +193,6 @@
             this.tvRegex.TabIndex = 0;
             this.tvRegex.TabStop = false;
             this.tvRegex.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TvRegexOnBeforeSelect);
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.Location = new System.Drawing.Point(11, 54);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(2);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.lblMessage);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(986, 665);
-            this.splitContainer1.SplitterDistance = 64;
-            this.splitContainer1.TabIndex = 7;
-            this.splitContainer1.TabStop = false;
-            // 
-            // lblMessage
-            // 
-            this.lblMessage.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.lblMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.lblMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblMessage.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMessage.Location = new System.Drawing.Point(0, 0);
-            this.lblMessage.Name = "lblMessage";
-            this.lblMessage.ReadOnly = true;
-            this.lblMessage.Size = new System.Drawing.Size(986, 64);
-            this.lblMessage.TabIndex = 0;
-            this.lblMessage.TabStop = false;
-            this.lblMessage.Text = "";
-            // 
-            // txtInput
-            // 
-            this.txtInput.AcceptsTab = true;
-            this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtInput.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtInput.Location = new System.Drawing.Point(0, 0);
-            this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(841, 64);
-            this.txtInput.TabIndex = 0;
-            this.txtInput.Text = "";
-            this.txtInput.TextChanged += new System.EventHandler(this.TxtInputOnTextChanged);
             // 
             // lvMessages
             // 
@@ -278,6 +244,43 @@
             this.columnHeaderMessage.Text = "Message";
             this.columnHeaderMessage.Width = 25;
             // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer1.Location = new System.Drawing.Point(11, 54);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(2);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.lblMessage);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Size = new System.Drawing.Size(986, 665);
+            this.splitContainer1.SplitterDistance = 64;
+            this.splitContainer1.TabIndex = 7;
+            this.splitContainer1.TabStop = false;
+            // 
+            // lblMessage
+            // 
+            this.lblMessage.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.lblMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.lblMessage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblMessage.Font = new System.Drawing.Font("Consolas", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMessage.Location = new System.Drawing.Point(0, 0);
+            this.lblMessage.Name = "lblMessage";
+            this.lblMessage.ReadOnly = true;
+            this.lblMessage.Size = new System.Drawing.Size(986, 64);
+            this.lblMessage.TabIndex = 0;
+            this.lblMessage.TabStop = false;
+            this.lblMessage.Text = "";
+            // 
             // txtPattern
             // 
             this.txtPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -292,6 +295,11 @@
             this.txtPattern.TabIndex = 0;
             this.txtPattern.Text = "";
             this.txtPattern.TextChanged += new System.EventHandler(this.TxtPatternOnTextChanged);
+            // 
+            // parseMenuStrip
+            // 
+            this.parseMenuStrip.Name = "contextMenuStrip";
+            this.parseMenuStrip.Size = new System.Drawing.Size(153, 26);
             // 
             // MainForm
             // 
@@ -309,8 +317,9 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Regular Expressions - Now You Have Two Problems!";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.contextMenuStrip.ResumeLayout(false);
+            this.compileMenuStrip.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
@@ -331,7 +340,7 @@
 
         private RegExpose.UI.RegExposeRichTextBox txtPattern;
         private WindowsFormsToolkit.Controls.SplitButton btnCompile;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
+        private System.Windows.Forms.ContextMenuStrip compileMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem ignoreCaseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem singleLineToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem multiLineToolStripMenuItem;
@@ -347,7 +356,8 @@
         private System.Windows.Forms.ColumnHeader columnHeaderType;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private RegExpose.UI.RegExposeRichTextBox lblMessage;
-        private System.Windows.Forms.Button btnParse;
+        private WindowsFormsToolkit.Controls.SplitButton btnParse;
+        private System.Windows.Forms.ContextMenuStrip parseMenuStrip;
     }
 }
 

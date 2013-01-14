@@ -27,7 +27,6 @@ namespace RegExpose
                 excludePredicate = step => false;
             }
 
-            var index = 0;
             var enumerator = _getParseSteps().GetEnumerator();
 
             while (true)
@@ -48,7 +47,7 @@ namespace RegExpose
 
                 if (error != null)
                 {
-                    yield return ParseStep.Error(error).SetStepIndex(index);
+                    yield return ParseStep.Error(error);
                     yield break;
                 }
 
@@ -57,8 +56,7 @@ namespace RegExpose
                     continue;
                 }
 
-                yield return enumerator.Current.SetStepIndex(index);
-                index++;
+                yield return enumerator.Current;
             }
         }
 

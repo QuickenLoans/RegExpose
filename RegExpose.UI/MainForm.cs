@@ -79,7 +79,7 @@ namespace RegExpose.UI
                     foreach (ListViewItem item in lvMessages.Items)
                     {
                         var itemCachedStep = (CachedStep)item.Tag;
-                        if (itemCachedStep.Step.StepIndex == step.StepIndex)
+                        if (itemCachedStep.StepIndex == cachedStep.StepIndex)
                         {
                             item.Selected = true;
                             lvMessages.Select();
@@ -105,7 +105,7 @@ namespace RegExpose.UI
                         }
                     }
 
-                    _indexPosition = txtInput.GetPositionFromCharIndex(step.StepIndex == 0 ? 0 : cachedStep.CurrentIndex);
+                    _indexPosition = txtInput.GetPositionFromCharIndex(cachedStep.StepIndex == 0 ? 0 : cachedStep.CurrentIndex);
 
                     if (cachedStep.CurrentLookaroundIndex == -1)
                     {
@@ -113,7 +113,7 @@ namespace RegExpose.UI
                     }
                     else
                     {
-                        _lookAroundIndexPosition = txtInput.GetPositionFromCharIndex(step.StepIndex == 0 ? 0 : cachedStep.CurrentLookaroundIndex);
+                        _lookAroundIndexPosition = txtInput.GetPositionFromCharIndex(cachedStep.StepIndex == 0 ? 0 : cachedStep.CurrentLookaroundIndex);
                     }
 
                     _savedStatesIndexPositions = cachedStep.SavedStatesIndexes.Select(index => txtInput.GetPositionFromCharIndex(index)).ToArray();
@@ -263,7 +263,7 @@ namespace RegExpose.UI
             try
             {
                 var engine = _regex.Parse(txtInput.Text);
-                cachedSteps = LoadSteps(engine.GetParseSteps()).ToList();
+                cachedSteps = LoadSteps(engine.GetParseSteps()).ToList(); // Calling ToList() will force any exception to be thrown right here.
             }
             catch (Exception ex)
             {
@@ -277,7 +277,7 @@ namespace RegExpose.UI
 
                 if (cachedStep.Step.Type != ParseStepType.Error)
                 {
-                    item.SubItems.Add(cachedStep.Step.StepIndex.ToString(CultureInfo.InvariantCulture))
+                    item.SubItems.Add(cachedStep.StepIndex.ToString(CultureInfo.InvariantCulture))
                         .BackColor = cachedStep.Step.Type == ParseStepType.Match ? Color.LawnGreen : item.BackColor;
 
                     item.SubItems.Add(cachedStep.Step.Type.ToString()).BackColor =
@@ -304,7 +304,7 @@ namespace RegExpose.UI
                 {
                     item.UseItemStyleForSubItems = false;
 
-                    item.SubItems.Add(cachedStep.Step.StepIndex.ToString(CultureInfo.InvariantCulture), Color.White, Color.Red, item.Font);
+                    item.SubItems.Add(cachedStep.StepIndex.ToString(CultureInfo.InvariantCulture), Color.White, Color.Red, item.Font);
                     item.SubItems.Add("???", Color.White, Color.Red, item.Font);
                     item.SubItems.Add("???", Color.White, Color.Red, item.Font);
                     item.SubItems.Add("???", Color.White, Color.Red, item.Font);
@@ -327,41 +327,39 @@ namespace RegExpose.UI
             var savedStates = new Stack<int>();
             var currentIndex = 0;
             var currentLookaroundIndex = -1;
+            var stepIndex = 0;
 
             foreach (var step in steps)
             {
-                if (step.Type == ParseStepType.StateSaved)
+                switch (step.Type)
                 {
-                    savedStates.Push(step.CurrentState.Index);
+                    case ParseStepType.StateSaved:
+                        savedStates.Push(step.CurrentState.Index);
+                        break;
+                    case ParseStepType.Match:
+                        savedStates.Clear();
+                        currentLookaroundIndex = -1;
+                        break;
+                    case ParseStepType.ResetIndex:
+                    case ParseStepType.AdvanceIndex:
+                        currentIndex = step.CurrentState.Index;
+                        currentLookaroundIndex = -1;
+                        break;
+                    case ParseStepType.Backtrack:
+                        currentIndex = savedStates.Pop();
+                        break;
+                    case ParseStepType.LookaroundStart:
+                    case ParseStepType.LookaroundResetIndex:
+                    case ParseStepType.LookaroundAdvanceIndex:
+                        currentLookaroundIndex = step.CurrentState.Index;
+                        break;
+                    case ParseStepType.LookaroundEnd:
+                        currentLookaroundIndex = -1;
+                        break;
                 }
-                else if (step.Type == ParseStepType.Match)
-                {
-                    savedStates.Clear();
-                    currentLookaroundIndex = -1;
-                }
-                else if (step.Type == ParseStepType.AdvanceIndex || step.Type == ParseStepType.ResetIndex)
-                {
-                    currentIndex = step.CurrentState.Index;
-                    currentLookaroundIndex = -1;
-                }
-                else if (step.Type == ParseStepType.Backtrack)
-                {
-                    currentIndex = savedStates.Pop();
-                }
-                else if (step.Type == ParseStepType.LookaroundStart)
-                {
-                    currentLookaroundIndex = step.CurrentState.Index;
-                }
-                else if (step.Type == ParseStepType.LookaroundEnd)
-                {
-                    currentLookaroundIndex = -1;
-                }
-                else if (step.Type == ParseStepType.LookaroundAdvanceIndex || step.Type == ParseStepType.LookaroundResetIndex)
-                {
-                    currentLookaroundIndex = step.CurrentState.Index;
-                }
-
-                yield return new CachedStep(step, currentIndex, currentLookaroundIndex, savedStates.ToArray());
+                
+                yield return new CachedStep(step, stepIndex, currentIndex, currentLookaroundIndex, savedStates.ToArray());
+                stepIndex++;
             }
         }
 

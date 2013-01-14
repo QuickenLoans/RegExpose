@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -210,13 +209,12 @@ namespace RegExpose.Tests
                     "| Index | Step          | Node Type                | {0} | Message",
                     "Pattern".PadRight(Math.Max(pattern.Length + 2, 7)));
             Debug.WriteLine(
-                    "|-------+---------------+--------------------------+-{0}-+---------------------------------------------------",
+                    "|---------------+--------------------------+-{0}-+---------------------------------------------------",
                     "".PadRight(Math.Max(pattern.Length + 2, 7), '-'));
             Debug.WriteLine(engine.GetParseSteps().Aggregate(
                 new StringBuilder(),
                 (sb, step) => sb.AppendFormat(
-                    "{0}{1}{2}{3}{4}",
-                    "| " + step.StepIndex.ToString(CultureInfo.InvariantCulture).PadRight(6),
+                    "{0}{1}{2}{3}",
                     "| " + step.Type.ToString().PadRight(14),
                     "| " + step.NodeType.PadRight(25),
                     "| " + step.Pattern.PadRight(Math.Max(pattern.Length + 3, 8)),
