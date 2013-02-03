@@ -173,6 +173,10 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DtoMapper.cs" />
+    <Compile Include="Services\ParseStepDto.cs" />
+    <Compile Include="Services\ParseStepsRequest.cs" />
+    <Compile Include="Services\ParseStepsResponse.cs" />
+    <Compile Include="Services\ParseStepsService.cs" />
     <Compile Include="Services\PatternRequest.cs" />
     <Compile Include="Services\PatternResponse.cs" />
     <Compile Include="Services\PatternService.cs" />

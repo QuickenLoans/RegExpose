@@ -56,6 +56,9 @@ namespace RegExpose.Web.Services
                             return children;
                         }));
 
+            Mapper.CreateMap<ParseStep, ParseStepDto>()
+                .ForMember(destination => destination.StepIndex, options => options.Ignore());
+
             Mapper.AssertConfigurationIsValid();
         }
 

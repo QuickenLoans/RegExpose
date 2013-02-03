@@ -23,7 +23,8 @@ namespace RegExpose.Web
             ServiceStack.Text.JsConfig.EmitCamelCaseNames = true;
 
             Routes
-              .Add<PatternRequest>("/getstructure", "GET,POST");
+              .Add<PatternRequest>("/getstructure", "GET,POST")
+              .Add<ParseStepsRequest>("/getparsesteps", "GET,POST");
 
             // Disabling Html seems to make it so browsers can't hit the service.
             var disableFeatures = Feature.Xml | Feature.Jsv | Feature.Csv | Feature.Soap;// | Feature.Html;
