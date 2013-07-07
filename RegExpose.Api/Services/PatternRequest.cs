@@ -1,10 +1,6 @@
 ﻿using ServiceStack.ServiceHost;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace RegExpose.Web.Services
+namespace RegExpose.Api.Services
 {
     public class PatternRequest : IReturn<PatternResponse>
     {

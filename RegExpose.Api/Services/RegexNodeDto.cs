@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
-namespace RegExpose.Web.Services
+namespace RegExpose.Api.Services
 {
     public class RegexNodeDto
     {

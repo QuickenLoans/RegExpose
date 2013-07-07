@@ -2,11 +2,8 @@
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.ServiceModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace RegExpose.Web.Services
+namespace RegExpose.Api.Services
 {
     public class PatternService : Service
     {

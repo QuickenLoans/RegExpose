@@ -1,16 +1,13 @@
-using System.Web.Mvc;
-using RegExpose.Web;
-using ServiceStack.Mvc;
-using ServiceStack.ServiceInterface.Auth;
+using RegExpose.Api;
+using RegExpose.Api.Services;
 using ServiceStack.WebHost.Endpoints;
-using RegExpose.Web.Services;
 using ServiceStack.ServiceHost;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(AppHost), "Start")]
 
-namespace RegExpose.Web
+namespace RegExpose.Api
 {
     public class AppHost
         : AppHostBase
