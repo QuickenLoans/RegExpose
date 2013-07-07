@@ -37,6 +37,7 @@
             this.btnCompile = new WindowsFormsToolkit.Controls.SplitButton();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.btnParse = new WindowsFormsToolkit.Controls.SplitButton();
+            this.parseMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.txtInput = new RegExpose.UI.RegExposeRichTextBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.tvRegex = new System.Windows.Forms.TreeView();
@@ -49,7 +50,6 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.lblMessage = new RegExpose.UI.RegExposeRichTextBox();
             this.txtPattern = new RegExpose.UI.RegExposeRichTextBox();
-            this.parseMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.compileMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
@@ -147,6 +147,11 @@
             this.btnParse.Text = "Parse";
             this.btnParse.UseVisualStyleBackColor = true;
             this.btnParse.Click += new System.EventHandler(this.BtnParseOnClick);
+            // 
+            // parseMenuStrip
+            // 
+            this.parseMenuStrip.Name = "contextMenuStrip";
+            this.parseMenuStrip.Size = new System.Drawing.Size(61, 4);
             // 
             // txtInput
             // 
@@ -296,11 +301,6 @@
             this.txtPattern.Text = "";
             this.txtPattern.TextChanged += new System.EventHandler(this.TxtPatternOnTextChanged);
             // 
-            // parseMenuStrip
-            // 
-            this.parseMenuStrip.Name = "contextMenuStrip";
-            this.parseMenuStrip.Size = new System.Drawing.Size(153, 26);
-            // 
             // MainForm
             // 
             this.AcceptButton = this.btnCompile;
@@ -317,6 +317,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Regular Expressions - Now You Have Two Problems!";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.compileMenuStrip.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel1.PerformLayout();

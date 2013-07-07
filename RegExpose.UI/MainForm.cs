@@ -13,14 +13,31 @@ namespace RegExpose.UI
     {
         private readonly Font _inputFont;
 
+        private readonly bool _isPresentation;
+        private readonly string _commandLinePattern;
+        private readonly string _commandLineInput;
+
         private Point _indexPosition = Point.Empty;
         private Point _lookAroundIndexPosition = Point.Empty;
         private Point[] _savedStatesIndexPositions = new Point[0];
         private Regex _regex;
 
-        public MainForm()
+        public MainForm(bool isPresentation, string pattern, string input)
         {
             InitializeComponent();
+
+            _isPresentation = isPresentation;
+            _commandLinePattern = pattern;
+            _commandLineInput = input;
+
+            if (isPresentation)
+            {
+                KeyDown += ControlOnKeyDown;
+                //txtInput.KeyDown += ControlOnKeyDown;
+            }
+
+            txtPattern.Text = pattern;
+            txtInput.Text = input;
 
             lvMessages.FullRowSelect = true;
             lvMessages.HideSelection = false;
@@ -28,6 +45,91 @@ namespace RegExpose.UI
             _inputFont = txtInput.Font;
 
             txtInput.Paint += TxtInputOnPaint;
+        }
+
+        private void ControlOnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == (Keys.LButton | Keys.RButton | Keys.Back | Keys.ShiftKey) || e.KeyCode == (Keys)116)
+            {
+                if (btnCompile.Enabled)
+                {
+                    if (btnParse.Enabled)
+                    {
+                        ParseInput();
+                    }
+                    else
+                    {
+                        CompileRegex();
+                    }
+                }
+            }
+            else if (e.KeyCode == (Keys.RButton | Keys.Space))
+            {
+                if (btnCompile.Enabled && btnParse.Enabled)
+                {
+                    if (lvMessages.Items.Count > 0)
+                    {
+                        if (lvMessages.SelectedIndices.Count == 0)
+                        {
+                            lvMessages.SelectedIndices.Add(0);
+                        }
+                        else if (lvMessages.SelectedIndices[0] < lvMessages.Items.Count - 1)
+                        {
+                            var currentIndex = lvMessages.SelectedIndices[0];
+                            lvMessages.SelectedIndices.Clear();
+                            lvMessages.SelectedIndices.Add(currentIndex + 1);
+                        }
+                    }
+                }
+                else
+                {
+                    splitContainer3.Panel2Collapsed = !splitContainer3.Panel2Collapsed;
+                }
+
+                e.SuppressKeyPress = _isPresentation;
+            }
+            else if (e.KeyCode == (Keys.LButton | Keys.Space))
+            {
+                if (btnCompile.Enabled && btnParse.Enabled)
+                {
+                    if (lvMessages.Items.Count > 0)
+                    {
+                        if (lvMessages.SelectedIndices.Count == 0)
+                        {
+                            lvMessages.SelectedIndices.Add(0);
+                        }
+                        else if (lvMessages.SelectedIndices[0] > 0)
+                        {
+                            var currentIndex = lvMessages.SelectedIndices[0];
+                            lvMessages.SelectedIndices.Clear();
+                            lvMessages.SelectedIndices.Add(currentIndex - 1);
+                        }
+                    }
+                }
+                else
+                {
+                    splitContainer3.Panel1Collapsed = !splitContainer3.Panel1Collapsed;
+                }
+
+                e.SuppressKeyPress = _isPresentation;
+            }
+            else if (e.KeyCode == (Keys.RButton | Keys.MButton | Keys.Back | Keys.ShiftKey | Keys.Space | Keys.F17))
+            {
+                Close();
+            }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            if (_commandLinePattern != null)
+            {
+                txtPattern.Text = _commandLinePattern;
+            }
+
+            if (_commandLineInput != null)
+            {
+                txtInput.Text = _commandLineInput;
+            }
         }
 
         private void LvMessagesOnSelectedIndexChanged(object sender, EventArgs e)
