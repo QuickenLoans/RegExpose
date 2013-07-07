@@ -66,8 +66,8 @@ namespace RegExpose.Nodes.Alternation
                 {
                     if (engine.State.Index != initialState.Index)
                     {
+                        yield return ParseStep.ResetIndex(this, initialState, engine.State);
                         engine.State = initialState;
-                        yield return ParseStep.ResetIndex(this, initialState);
                     }
                 }
 
