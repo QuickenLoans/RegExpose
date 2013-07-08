@@ -9,7 +9,7 @@ namespace RegExpose.Api.Services
     {
         public object Any(PatternRequest request)
         {
-            var compiler = new RegexCompiler(request.IgnoreCase, request.SingleLine, request.MultiLine);
+            var compiler = new RegexCompiler();
 
             PatternResponse response;
 

@@ -1,5 +1,6 @@
 using RegExpose.Api;
 using RegExpose.Api.Services;
+using ServiceStack.Api.Swagger;
 using ServiceStack.WebHost.Endpoints;
 using ServiceStack.ServiceHost;
 using ServiceStack.Common;
@@ -19,15 +20,13 @@ namespace RegExpose.Api
         {
             ServiceStack.Text.JsConfig.EmitCamelCaseNames = true;
 
-            Routes
-              .Add<PatternRequest>("/getstructure", "GET,POST")
-              .Add<ParseStepsRequest>("/getparsesteps", "GET,POST");
+            Plugins.Add(new SwaggerFeature());
 
             // Disabling Html seems to make it so browsers can't hit the service.
-            var disableFeatures = Feature.Xml | Feature.Jsv | Feature.Csv | Feature.Soap;// | Feature.Html;
+            const Feature DisableFeatures = Feature.Xml | Feature.Jsv | Feature.Csv | Feature.Soap; // | Feature.Html;
             SetConfig(new EndpointHostConfig
             {
-                EnableFeatures = Feature.All.Remove(disableFeatures),
+                EnableFeatures = Feature.All.Remove(DisableFeatures),
                 DefaultContentType = ContentType.Json
             });
 

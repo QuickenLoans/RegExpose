@@ -8,10 +8,13 @@ namespace RegExpose.Api.Services
 {
     public class ParseStepsService : Service
     {
-        private const int MaxStepCountPerRequest = 1000;
+        private static readonly int MaxStepCountPerRequest = int.Parse(ParseStepsRequest.MaxStepCountPerRequest);
 
         public object Any(ParseStepsRequest request)
         {
+            var skip = request.Skip.HasValue ? Math.Max(0, request.Skip.Value) : 0;
+            var take = request.Take.HasValue ? Math.Min(MaxStepCountPerRequest, request.Take.Value) : MaxStepCountPerRequest;
+
             var compiler = new RegexCompiler(request.IgnoreCase, request.SingleLine, request.MultiLine);
 
             ParseStepsResponse response;
@@ -28,8 +31,8 @@ namespace RegExpose.Api.Services
                             parseStepDto.StepIndex = stepIndex;
                             return parseStepDto;
                         })
-                        .Skip(request.Skip ?? 0)
-                        .Take(request.Take == null ? MaxStepCountPerRequest : Math.Min(request.Take.Value, MaxStepCountPerRequest));
+                        .Skip(skip)
+                        .Take(take);
 
                 var regexDto = DtoMapper.Map<RegexNodeDto>(regex);
 
