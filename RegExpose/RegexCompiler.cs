@@ -31,13 +31,15 @@ namespace RegExpose
 
         public RegexCompiler(bool ignoreCase = false, bool singleLine = false, bool multiLine = false)
         {
-            _characterNode = CreateQuantifierParser(CreateCharacterNodeParser(ignoreCase, singleLine));
+            var quantifierParamsParser = CreateQuantifierParamsParser();
+
+            _characterNode = CreateQuantifierParser(CreateCharacterNodeParser(ignoreCase, singleLine), quantifierParamsParser);
             _anchor = CreateAnchorParser(multiLine);
             _wordBoundry = CreateWordBoundryParser();
             _backreference = CreateBackreferenceParser(ignoreCase);
             _nonContainer = _characterNode.Or(_anchor).Or(_wordBoundry).Or(_backreference);
 
-            _container = CreateQuantifierParser(x => GetContainer(x));
+            _container = CreateQuantifierParser(x => GetContainer(x, quantifierParamsParser), quantifierParamsParser);
 
             _node = _container.Or(_nonContainer);
 
@@ -312,54 +314,8 @@ namespace RegExpose
             return backreferenceParser.Or(angleBracketNamedBackreferenceParser).Or(tickNamedBackreferenceParser);
         }
 
-        private static Parser<RegexNode> CreateQuantifierParser(Parser<RegexNode> childParser)
+        private static Parser<RegexNode> CreateQuantifierParser(Parser<RegexNode> childParser, Parser<QuantifierParams> quantifierParamsParser)
         {
-            var quantifierParamsParser =
-                from required in
-                    Parse.Char('+').Select(x => new QuantifierParams
-                    {
-                        Shorthand = x
-                    })
-                    .Or(Parse.Char('*').Select(x => new QuantifierParams
-                    {
-                        Shorthand = x
-                    }))
-                    .Or(Parse.Char('?').Select(x => new QuantifierParams
-                    {
-                        Shorthand = x
-                    }))
-                    .Or(
-                        from open in Parse.Char('{').Once().Text()
-                        from min in Parse.Numeric.AtLeastOnce().Text()
-                        from commaAndOrMax in
-                            (from comma in Parse.Char(',').Once().Text()
-                             from max in Parse.Numeric.AtLeastOnce().Text().XOr(Parse.Return(""))
-                             select Tuple.Create(comma, max))
-                            .XOr(Parse.Return(Tuple.Create("", "")))
-                        from close in Parse.Char('}').Once().Text()
-                        select new QuantifierParams
-                        {
-                            Min = int.Parse(min),
-                            Max =
-                            (commaAndOrMax.Item1 != "" && commaAndOrMax.Item2 != "")
-                                ? int.Parse(commaAndOrMax.Item2)
-                                : (commaAndOrMax.Item1 != "")
-                                      ? (int?) null
-                                      : int.Parse(min)
-                        }
-                    )
-                from optional in
-                    (Parse.Char('?').Select(x => (char?) x)
-                    .Or(Parse.Char('+').Select(x => (char?) x))
-                    .XOr(Parse.Return((char?) null)))
-                select new QuantifierParams
-                {
-                    Shorthand = required.Shorthand,
-                    Min = required.Min,
-                    Max = required.Max,
-                    Optional = optional
-                };
-
             return
                 (from child in childParser
                  from quantifierParams in quantifierParamsParser.XOr(Parse.Return((QuantifierParams) null))
@@ -373,6 +329,55 @@ namespace RegExpose
                         Parse.Return(result.quantifierParams != null
                                          ? CreateQuantifier(result.quantifierParams, result.child, index, pattern)
                                          : result.child));
+        }
+
+        private static Parser<QuantifierParams> CreateQuantifierParamsParser()
+        {
+            return
+                from required in
+                Parse.Char('+').Select(x => new QuantifierParams
+                {
+                    Shorthand = x
+                })
+                .Or(Parse.Char('*').Select(x => new QuantifierParams
+                {
+                    Shorthand = x
+                }))
+                .Or(Parse.Char('?').Select(x => new QuantifierParams
+                {
+                    Shorthand = x
+                }))
+                .Or(
+                    from open in Parse.Char('{').Once().Text()
+                    from min in Parse.Numeric.AtLeastOnce().Text()
+                    from commaAndOrMax in
+                        (from comma in Parse.Char(',').Once().Text()
+                         from max in Parse.Numeric.AtLeastOnce().Text().XOr(Parse.Return(""))
+                         select Tuple.Create(comma, max))
+                        .XOr(Parse.Return(Tuple.Create("", "")))
+                    from close in Parse.Char('}').Once().Text()
+                    select new QuantifierParams
+                    {
+                        Min = int.Parse(min),
+                        Max =
+                        (commaAndOrMax.Item1 != "" && commaAndOrMax.Item2 != "")
+                            ? int.Parse(commaAndOrMax.Item2)
+                            : (commaAndOrMax.Item1 != "")
+                                  ? (int?) null
+                                  : int.Parse(min)
+                    }
+                )
+            from optional in
+                (Parse.Char('?').Select(x => (char?) x)
+                .Or(Parse.Char('+').Select(x => (char?) x))
+                .XOr(Parse.Return((char?) null)))
+            select new QuantifierParams
+            {
+                Shorthand = required.Shorthand,
+                Min = required.Min,
+                Max = required.Max,
+                Optional = optional
+            };
         }
 
         private static RegexNode CreateQuantifier(QuantifierParams quantifierParams,
@@ -430,7 +435,7 @@ namespace RegExpose
             return new GreedyQuantifier(quantifierParams.Min.Value, quantifierParams.Max, child, index, pattern);
         }
 
-        private IResult<RegexNode> GetContainer(Input input)
+        private IResult<RegexNode> GetContainer(Input input, Parser<QuantifierParams> quantifierParamsParser)
         {
             if (input.AtEnd)
             {
@@ -453,8 +458,8 @@ namespace RegExpose
 
             while (!input.AtEnd)
             {
-                var success = _nonContainer(input) as ISuccess<RegexNode>;
-                if (success != null)
+                var nonContainerSuccess = _nonContainer(input) as ISuccess<RegexNode>;
+                if (nonContainerSuccess != null)
                 {
                     if (containerStack.Count == 0)
                     {
@@ -483,155 +488,176 @@ namespace RegExpose
                         candidateNodes.Add(key, new List<RegexNode>());
                     }
 
-                    candidateNodes[key].Add(success.Result);
-                    input = success.Remainder;
+                    candidateNodes[key].Add(nonContainerSuccess.Result);
+                    input = nonContainerSuccess.Remainder;
                 }
                 else
                 {
-                    switch (input.Current)
+                    var quantifierParamsSuccess = quantifierParamsParser(input) as ISuccess<QuantifierParams>;
+
+                    if (quantifierParamsSuccess != null)
                     {
-                        case ')':
-                            var containerInfo = containerStack.Pop();
+                        var parenKey = containerStack.Peek().Key;
+                        var nodes = candidateNodes[parenKey];
 
-                            if (containerInfo.ContainerType == ContainerType.Alternation)
-                            {
-                                var alternationKey = containerInfo.Key;
-                                var alternationChildren = candidateNodes[alternationKey];
+                        var quantifierPattern = input.Source.Substring(input.Position, quantifierParamsSuccess.Remainder.Position - input.Position);
 
-                                var alternation = CreateAlternation(input, alternationChildren);
+                        nodes[nodes.Count - 1] = CreateQuantifier(
+                            quantifierParamsSuccess.Result,
+                            nodes[nodes.Count - 1],
+                            nodes[nodes.Count - 1].Index,
+                            nodes[nodes.Count - 1].Pattern + quantifierPattern);
 
-                                containerInfo = containerStack.Pop();
-                                candidateNodes[containerInfo.Key] = new List<RegexNode>
+                        input = quantifierParamsSuccess.Remainder;
+                        continue;
+                    }
+                    else
+                    {
+                        switch (input.Current)
+                        {
+                            case ')':
+                                var containerInfo = containerStack.Pop();
+
+                                if (containerInfo.ContainerType == ContainerType.Alternation)
                                 {
-                                    alternation
-                                };
-                            }
+                                    var alternationKey = containerInfo.Key;
+                                    var alternationChildren = candidateNodes[alternationKey];
 
-                            var children = candidateNodes[containerInfo.Key];
-                            candidateNodes.Remove(containerInfo.Key);
-                            var index = containerInfo.Index;
-                            var pattern = input.Source.Substring(containerInfo.Index,
-                                                                 (input.Position - containerInfo.Index) + 1);
+                                    var alternation = CreateAlternation(input, alternationChildren);
 
-                            ContainerNode paren;
-
-                            if (containerInfo.ParenType == ParenType.Capturing)
-                            {
-                                paren = new CapturingParens(children, index, pattern);
-                            }
-                            else if (containerInfo.ParenType == ParenType.NonCapturing)
-                            {
-                                paren = new NonCapturingParens(children, index, pattern);
-                            }
-                            else if (containerInfo.ParenType == ParenType.PositiveLookAhead)
-                            {
-                                paren = new LookAhead(false, children, index, pattern);
-                            }
-                            else if (containerInfo.ParenType == ParenType.NegativeLookAhead)
-                            {
-                                paren = new LookAhead(true, children, index, pattern);
-                            }
-                            else if (containerInfo.ParenType == ParenType.PositiveLookBehind)
-                            {
-                                paren = new LookBehind(false, children, index, pattern);
-                            }
-                            else if (containerInfo.ParenType == ParenType.NegativeLookBehind)
-                            {
-                                paren = new LookBehind(true, children, index, pattern);
-                            }
-                            else if (containerInfo.ParenType == ParenType.Atomic)
-                            {
-                                paren = new AtomicGrouping(children, index, pattern);
-                            }
-                            else
-                            {
-                                paren = new NamedCapture(containerInfo.ParenType.Name, children, index, pattern);
-                            }
-
-                            if (containerStack.Count > 0)
-                            {
-                                var parenKey = containerStack.Peek().Key;
-
-                                if (!candidateNodes.ContainsKey(parenKey))
-                                {
-                                    candidateNodes.Add(parenKey, new List<RegexNode>());
+                                    containerInfo = containerStack.Pop();
+                                    candidateNodes[containerInfo.Key] = new List<RegexNode>
+                                    {
+                                        alternation
+                                    };
                                 }
 
-                                candidateNodes[parenKey].Add(paren);
-                            }
-                            else
-                            {
-                                return new Success<RegexNode>(paren, input.Advance());
-                            }
+                                var children = candidateNodes[containerInfo.Key];
+                                candidateNodes.Remove(containerInfo.Key);
+                                var index = containerInfo.Index;
+                                var pattern = input.Source.Substring(containerInfo.Index,
+                                                                     (input.Position - containerInfo.Index) + 1);
 
-                            break;
-                        case '(':
-                            var parentTypeParser =
-                                from leftParen in Parse.Char('(')
-                                from p in
-                                    (from question in Parse.Char('?')
-                                     from p in
-                                         Parse.Char(':').Select(x => ParenType.NonCapturing)
-                                         .Or(Parse.Char('=').Select(x => ParenType.PositiveLookAhead))
-                                         .Or(Parse.Char('!').Select(x => ParenType.NegativeLookAhead))
-                                         .Or(Parse.Char('>').Select(x => ParenType.Atomic))
-                                         .Or(Parse.String("<=").Select(x => ParenType.PositiveLookBehind))
-                                         .Or(Parse.String("<!").Select(x => ParenType.NegativeLookBehind))
-                                         .Or(
-                                             from open in Parse.Char('<')
-                                             from name in Parse.LetterOrDigit.Or(Parse.Char('_')).AtLeastOnce().Text()
-                                             from close in Parse.Char('>')
-                                             select ParenType.NamedCapture(name))
-                                         .Or(
-                                             from open in Parse.Char('\'')
-                                             from name in Parse.LetterOrDigit.Or(Parse.Char('_')).AtLeastOnce().Text()
-                                             from close in Parse.Char('\'')
-                                             select ParenType.NamedCapture(name))
-                                     select p)
-                                    .XOr(Parse.Return(ParenType.Capturing))
-                                select p;
+                                ContainerNode paren;
 
-                            var parenType = ((ISuccess<ParenType>) parentTypeParser(input)).Result;
-
-                            containerStack.Push(new ContainerInfo
-                            {
-                                Index = input.Position,
-                                ContainerType = ContainerType.Parens,
-                                ParenType = parenType
-                            });
-
-                            input = parenType.Advance(input);
-                            break;
-                        case '|':
-                            var container = containerStack.Peek();
-
-                            if (container.ContainerType != ContainerType.Alternation)
-                            {
-                                var alternationNodes = candidateNodes[container.Key];
-                                var partialAlternation = new AlternationMarker(alternationNodes.First().Index);
-
-                                candidateNodes[container.Key] = new List<RegexNode>
+                                if (containerInfo.ParenType == ParenType.Capturing)
                                 {
-                                    partialAlternation
-                                };
-
-                                var alternationInfo = new ContainerInfo
+                                    paren = new CapturingParens(children, index, pattern);
+                                }
+                                else if (containerInfo.ParenType == ParenType.NonCapturing)
                                 {
-                                    Index = partialAlternation.Index,
-                                    ContainerType = ContainerType.Alternation
-                                };
-                                containerStack.Push(alternationInfo);
+                                    paren = new NonCapturingParens(children, index, pattern);
+                                }
+                                else if (containerInfo.ParenType == ParenType.PositiveLookAhead)
+                                {
+                                    paren = new LookAhead(false, children, index, pattern);
+                                }
+                                else if (containerInfo.ParenType == ParenType.NegativeLookAhead)
+                                {
+                                    paren = new LookAhead(true, children, index, pattern);
+                                }
+                                else if (containerInfo.ParenType == ParenType.PositiveLookBehind)
+                                {
+                                    paren = new LookBehind(false, children, index, pattern);
+                                }
+                                else if (containerInfo.ParenType == ParenType.NegativeLookBehind)
+                                {
+                                    paren = new LookBehind(true, children, index, pattern);
+                                }
+                                else if (containerInfo.ParenType == ParenType.Atomic)
+                                {
+                                    paren = new AtomicGrouping(children, index, pattern);
+                                }
+                                else
+                                {
+                                    paren = new NamedCapture(containerInfo.ParenType.Name, children, index, pattern);
+                                }
 
-                                container = containerStack.Peek();
-                                candidateNodes[container.Key] = new List<RegexNode>(alternationNodes);
-                            }
+                                if (containerStack.Count > 0)
+                                {
+                                    var parenKey = containerStack.Peek().Key;
 
-                            candidateNodes[container.Key].Add(new AlternationMarker(input.Position));
-                            break;
-                        default:
-                            return new Failure<RegexNode>(input,
-                                                          () => "Unexpected character found inside parenthesis",
-                                                          () => new[] { "GetContainer" });
+                                    if (!candidateNodes.ContainsKey(parenKey))
+                                    {
+                                        candidateNodes.Add(parenKey, new List<RegexNode>());
+                                    }
+
+                                    candidateNodes[parenKey].Add(paren);
+                                }
+                                else
+                                {
+                                    return new Success<RegexNode>(paren, input.Advance());
+                                }
+
+                                break;
+                            case '(':
+                                var parentTypeParser =
+                                    from leftParen in Parse.Char('(')
+                                    from p in
+                                        (from question in Parse.Char('?')
+                                         from p in
+                                             Parse.Char(':').Select(x => ParenType.NonCapturing)
+                                             .Or(Parse.Char('=').Select(x => ParenType.PositiveLookAhead))
+                                             .Or(Parse.Char('!').Select(x => ParenType.NegativeLookAhead))
+                                             .Or(Parse.Char('>').Select(x => ParenType.Atomic))
+                                             .Or(Parse.String("<=").Select(x => ParenType.PositiveLookBehind))
+                                             .Or(Parse.String("<!").Select(x => ParenType.NegativeLookBehind))
+                                             .Or(
+                                                 from open in Parse.Char('<')
+                                                 from name in Parse.LetterOrDigit.Or(Parse.Char('_')).AtLeastOnce().Text()
+                                                 from close in Parse.Char('>')
+                                                 select ParenType.NamedCapture(name))
+                                             .Or(
+                                                 from open in Parse.Char('\'')
+                                                 from name in Parse.LetterOrDigit.Or(Parse.Char('_')).AtLeastOnce().Text()
+                                                 from close in Parse.Char('\'')
+                                                 select ParenType.NamedCapture(name))
+                                         select p)
+                                        .XOr(Parse.Return(ParenType.Capturing))
+                                    select p;
+
+                                var parenType = ((ISuccess<ParenType>)parentTypeParser(input)).Result;
+
+                                containerStack.Push(new ContainerInfo
+                                {
+                                    Index = input.Position,
+                                    ContainerType = ContainerType.Parens,
+                                    ParenType = parenType
+                                });
+
+                                input = parenType.Advance(input);
+                                break;
+                            case '|':
+                                var container = containerStack.Peek();
+
+                                if (container.ContainerType != ContainerType.Alternation)
+                                {
+                                    var alternationNodes = candidateNodes[container.Key];
+                                    var partialAlternation = new AlternationMarker(alternationNodes.First().Index);
+
+                                    candidateNodes[container.Key] = new List<RegexNode>
+                                    {
+                                        partialAlternation
+                                    };
+
+                                    var alternationInfo = new ContainerInfo
+                                    {
+                                        Index = partialAlternation.Index,
+                                        ContainerType = ContainerType.Alternation
+                                    };
+                                    containerStack.Push(alternationInfo);
+
+                                    container = containerStack.Peek();
+                                    candidateNodes[container.Key] = new List<RegexNode>(alternationNodes);
+                                }
+
+                                candidateNodes[container.Key].Add(new AlternationMarker(input.Position));
+                                break;
+                            default:
+                                return new Failure<RegexNode>(input,
+                                                              () => "Unexpected character found inside parenthesis",
+                                                              () => new[] { "GetContainer" });
+                        }
                     }
 
                     input = input.Advance();
