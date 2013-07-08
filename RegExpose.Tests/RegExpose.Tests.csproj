@@ -77,7 +77,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RegExpose\RegExpose.csproj">
       <Project>{9AE6D09D-71B5-4AD9-B6D4-E36AC4F8F55B}</Project>
-      <Name>RandomSkunk.RegularExpressions</Name>
+      <Name>RegExpose</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

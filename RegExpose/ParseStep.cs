@@ -164,13 +164,14 @@ namespace RegExpose
             }.WithMessage(step => "Parse started");
         }
 
-        public static ParseStep ResetIndex(RegexNode node, State initialState)
+        public static ParseStep ResetIndex(RegexNode node, State initialState, State currentState)
         {
             return new ParseStep
             {
                 Type = ParseStepType.ResetIndex,
                 Node = node,
-                InitialState = initialState
+                InitialState = initialState,
+                CurrentState = currentState
             }.WithMessage(step => string.Format("Resetting index to {0}", step.InitialState.Index));
         }
 

@@ -27,7 +27,7 @@ namespace RegExpose.Nodes.Parens
 
             bool match = false;
 
-            yield return ParseStep.StartLookaround(this, engine.State).WithSkipAdvanceOnFail(ShouldSkipAdvance);
+            yield return ParseStep.StartLookaround(this, engine.State.Plus(modifier)).WithSkipAdvanceOnFail(ShouldSkipAdvance);
 
             foreach (var result in _regex.Parse(engine))
             {

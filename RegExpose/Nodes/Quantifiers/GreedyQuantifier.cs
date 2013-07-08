@@ -101,8 +101,14 @@ namespace RegExpose.Nodes.Quantifiers
             }
 
             // If we get here, we ran out of saved states to backtrack to - report failure.
-            engine.State = initialState;
             yield return ParseStep.Fail(this, initialState, engine.State, "No backtrack is available");
+
+            if (engine.State.Index != initialState.Index)
+            {
+                yield return ParseStep.ResetIndex(this, initialState, engine.State);
+                engine.State = initialState;
+            }
+
             yield return ParseStep.Break(this);
         }
 
