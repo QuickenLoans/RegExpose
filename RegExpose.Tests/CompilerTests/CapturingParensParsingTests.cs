@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using RegExpose.Nodes.Character;
 using RegExpose.Nodes.Parens;
+using RegExpose.Nodes.Quantifiers;
 
 namespace RegExpose.Tests.CompilerTests
 {
@@ -100,6 +101,34 @@ namespace RegExpose.Tests.CompilerTests
             Assert.That(children2[0], Is.InstanceOf<CharacterLiteral>());
             Assert.That(children2[1], Is.InstanceOf<CharacterLiteral>());
             Assert.That(children2[2], Is.InstanceOf<CharacterLiteral>());
+        }
+
+        [Test]
+        public void NestedQuantifierParensParseCorrectly()
+        {
+            const string pattern = @"(ab(12)?xy)";
+            var sut = new RegexCompiler();
+
+            var result = sut.Compile(pattern);
+
+            var nodes = result.Children.ToList();
+            Assert.That(nodes.Count, Is.EqualTo(1));
+            Assert.That(nodes[0], Is.InstanceOf<CapturingParens>());
+            var capturingParens1 = (CapturingParens)nodes[0];
+            Assert.That(capturingParens1.Number, Is.EqualTo(1));
+            var children1 = capturingParens1.Children;
+            Assert.That(children1.Count, Is.EqualTo(5));
+            Assert.That(children1[0], Is.InstanceOf<CharacterLiteral>());
+            Assert.That(children1[1], Is.InstanceOf<CharacterLiteral>());
+            Assert.That(children1[2], Is.InstanceOf<GreedyQuestionMark>());
+            Assert.That(children1[3], Is.InstanceOf<CharacterLiteral>());
+            Assert.That(children1[4], Is.InstanceOf<CharacterLiteral>());
+            var greedyQuestionMark = (GreedyQuestionMark)children1[2];
+            Assert.That(greedyQuestionMark.Child, Is.InstanceOf<CapturingParens>());
+            var children2 = ((CapturingParens)greedyQuestionMark.Child).Children;
+            Assert.That(children2.Count, Is.EqualTo(2));
+            Assert.That(children2[0], Is.InstanceOf<CharacterLiteral>());
+            Assert.That(children2[1], Is.InstanceOf<CharacterLiteral>());
         }
 
         [TestCase(@"(abc(123)")]
