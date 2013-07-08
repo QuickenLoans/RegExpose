@@ -180,9 +180,9 @@
     <Compile Include="Services\ParseStepsRequest.cs" />
     <Compile Include="Services\ParseStepsResponse.cs" />
     <Compile Include="Services\ParseStepsService.cs" />
-    <Compile Include="Services\PatternRequest.cs" />
-    <Compile Include="Services\PatternResponse.cs" />
-    <Compile Include="Services\PatternService.cs" />
+    <Compile Include="Services\StructureRequest.cs" />
+    <Compile Include="Services\StructureResponse.cs" />
+    <Compile Include="Services\StructureService.cs" />
     <Compile Include="Services\RegexNodeDto.cs" />
   </ItemGroup>
   <ItemGroup>
