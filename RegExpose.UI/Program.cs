@@ -26,7 +26,7 @@ namespace RegExpose.UI
         private static string GetPattern(string[] args)
         {
             return
-                args.Select(arg => System.Text.RegularExpressions.Regex.Match(arg, "^/pattern=([^$]+)$", RegexOptions.IgnoreCase))
+                args.Select(arg => System.Text.RegularExpressions.Regex.Match(arg, "^/pattern=(.+)$", RegexOptions.IgnoreCase))
                     .Where(match => match.Success)
                     .Select(match => match.Groups[1].Value)
                     .FirstOrDefault();
@@ -35,7 +35,7 @@ namespace RegExpose.UI
         private static string GetInput(string[] args)
         {
             return
-                args.Select(arg => System.Text.RegularExpressions.Regex.Match(arg, "^/input=([^$]+)$", RegexOptions.IgnoreCase))
+                args.Select(arg => System.Text.RegularExpressions.Regex.Match(arg, "^/input=(.+)$", RegexOptions.IgnoreCase))
                     .Where(match => match.Success)
                     .Select(match => match.Groups[1].Value)
                     .FirstOrDefault();
