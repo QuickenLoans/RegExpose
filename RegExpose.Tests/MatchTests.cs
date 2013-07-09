@@ -9,6 +9,24 @@ namespace RegExpose.Tests
 {
     public class MatchTests : MatchTestsBase
     {
+        [TestCase("ab", @"ab", RegexOptions.None)]
+        [TestCase("aab", @"ab", RegexOptions.None)]
+        [TestCase("abxab", @"ab", RegexOptions.None)]
+        [TestCase("xabx", @"ab", RegexOptions.None)]
+        public void CharacterLiteralSimple(string input, string pattern, RegexOptions options)
+        {
+            PerformTest(input, pattern, options);
+        }
+
+        [TestCase("ab", @"[ab][bc]", RegexOptions.None)]
+        [TestCase("aab", @"[ab][bc]", RegexOptions.None)]
+        [TestCase("abxab", @"[ab][bc]", RegexOptions.None)]
+        [TestCase("xabx", @"[ab][bc]", RegexOptions.None)]
+        public void CharacterClassSimple(string input, string pattern, RegexOptions options)
+        {
+            PerformTest(input, pattern, options);
+        }
+
         [TestCase("a", @"^a", RegexOptions.None)]
         [TestCase("1a", @"^a", RegexOptions.None)]
         [TestCase("1\na", @"^a", RegexOptions.None)]
