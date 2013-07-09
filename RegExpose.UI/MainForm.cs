@@ -17,7 +17,8 @@ namespace RegExpose.UI
         private readonly string _commandLinePattern;
         private readonly string _commandLineInput;
 
-        private Point _indexPosition = Point.Empty;
+        private Point _regexIndexPosition = Point.Empty;
+        private Point _currentIndexPosition = Point.Empty;
         private Point _lookAroundIndexPosition = Point.Empty;
         private Point[] _savedStatesIndexPositions = new Point[0];
         private Regex _regex;
@@ -207,7 +208,8 @@ namespace RegExpose.UI
                         }
                     }
 
-                    _indexPosition = txtInput.GetPositionFromCharIndex(cachedStep.StepIndex == 0 ? 0 : cachedStep.CurrentIndex);
+                    _regexIndexPosition = txtInput.GetPositionFromCharIndex(cachedStep.StepIndex == 0 ? 0 : cachedStep.RegexIndex);
+                    _currentIndexPosition = txtInput.GetPositionFromCharIndex(cachedStep.StepIndex == 0 ? 0 : cachedStep.CurrentIndex);
 
                     if (cachedStep.CurrentLookaroundIndex == -1)
                     {
@@ -253,7 +255,8 @@ namespace RegExpose.UI
             txtPattern.ClearHighlights();
             txtInput.ClearHighlights();
 
-            _indexPosition = Point.Empty;
+            _regexIndexPosition = Point.Empty;
+            _currentIndexPosition = Point.Empty;
             _lookAroundIndexPosition = Point.Empty;
             _savedStatesIndexPositions = new Point[0];
             txtInput.Invalidate();
@@ -290,9 +293,17 @@ namespace RegExpose.UI
                 }
             }
 
-            if (_indexPosition != Point.Empty)
+            if (_regexIndexPosition != Point.Empty)
             {
-                var p = new PointF(_indexPosition.X, _indexPosition.Y + (size.Height * 0.8f));
+                var p = new PointF(_regexIndexPosition.X, _regexIndexPosition.Y + (size.Height * 0.8f));
+
+                e.Graphics.DrawLine(new Pen(Color.Black, 5), p.X + 2, p.Y - 2, p.X - 10.5f, p.Y + 10.5f);
+                e.Graphics.DrawLine(new Pen(Color.Black, 5), p.X - 2, p.Y - 2, p.X + 10f, p.Y + 10f);
+            }
+
+            if (_currentIndexPosition != Point.Empty)
+            {
+                var p = new PointF(_currentIndexPosition.X, _currentIndexPosition.Y + (size.Height * 0.8f));
 
                 e.Graphics.DrawLine(new Pen(Color.Red, 3), p.X + 1, p.Y - 1, p.X - 10, p.Y + 10);
                 e.Graphics.DrawLine(new Pen(Color.Red, 3), p.X - 1, p.Y - 1, p.X + 10, p.Y + 10);
@@ -430,11 +441,18 @@ namespace RegExpose.UI
             var currentIndex = 0;
             var currentLookaroundIndex = -1;
             var stepIndex = 0;
+            var regexIndex = 0;
 
             foreach (var step in steps)
             {
                 switch (step.Type)
                 {
+                    case ParseStepType.BeginParse:
+                        if (step.Node is Regex)
+                        {
+                            regexIndex = step.InitialState.Index;
+                        }
+                        break;
                     case ParseStepType.StateSaved:
                         savedStates.Push(step.CurrentState.Index);
                         break;
@@ -449,6 +467,11 @@ namespace RegExpose.UI
                     case ParseStepType.AdvanceIndex:
                         currentIndex = step.CurrentState.Index;
                         currentLookaroundIndex = -1;
+
+                        if (step.Node is Regex)
+                        {
+                            regexIndex = step.CurrentState.Index;
+                        }
                         break;
                     case ParseStepType.Backtrack:
                         currentIndex = savedStates.Pop();
@@ -463,7 +486,7 @@ namespace RegExpose.UI
                         break;
                 }
                 
-                yield return new CachedStep(step, stepIndex, currentIndex, currentLookaroundIndex, savedStates.ToArray());
+                yield return new CachedStep(step, stepIndex, regexIndex, currentIndex, currentLookaroundIndex, savedStates.ToArray());
                 stepIndex++;
             }
         }

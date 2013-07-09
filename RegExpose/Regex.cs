@@ -60,7 +60,7 @@ namespace RegExpose
 
             if (!skipAdvance)
             {
-                engine.State = engine.State.Advance();
+                engine.State = initialState.Advance();
                 yield return ParseStep.AdvanceIndex(this, engine.State);
             }
         }
